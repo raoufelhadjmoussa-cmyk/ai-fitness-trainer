@@ -1,8 +1,15 @@
 ﻿import cv2
 import numpy as np
 from abc import ABC, abstractmethod
-from mediapipe.python.solutions.pose import Pose, POSE_CONNECTIONS
-from mediapipe.python.solutions.drawing_utils import draw_landmarks
+
+try:
+    from mediapipe.python.solutions.pose import Pose, POSE_CONNECTIONS
+    from mediapipe.python.solutions.drawing_utils import draw_landmarks
+except ImportError:
+    import mediapipe as mp
+    Pose = mp.solutions.pose.Pose
+    POSE_CONNECTIONS = mp.solutions.pose.POSE_CONNECTIONS
+    draw_landmarks = mp.solutions.drawing_utils.draw_landmarks
 
 class PoseDetectorBase(ABC):
     @abstractmethod
