@@ -1,27 +1,21 @@
 ﻿import cv2
 import numpy as np
 from abc import ABC, abstractmethod
-
 from mediapipe.python.solutions.pose import Pose, POSE_CONNECTIONS
 from mediapipe.python.solutions.drawing_utils import draw_landmarks
 
 class PoseDetectorBase(ABC):
     @abstractmethod
-    def find_pose(self, img, draw=True):
-        pass
+    def find_pose(self, img, draw=True): pass
     @abstractmethod
-    def get_landmarks(self, img):
-        pass
+    def get_landmarks(self, img): pass
 
 class MediaPipeDetector(PoseDetectorBase):
     def __init__(self, static_mode=False, model_complexity=1,
                  min_detection_confidence=0.5, min_tracking_confidence=0.5):
-        self.pose = Pose(
-            static_image_mode=static_mode,
-            model_complexity=model_complexity,
-            min_detection_confidence=min_detection_confidence,
-            min_tracking_confidence=min_tracking_confidence
-        )
+        self.pose = Pose(static_image_mode=static_mode, model_complexity=model_complexity,
+                         min_detection_confidence=min_detection_confidence,
+                         min_tracking_confidence=min_tracking_confidence)
         self.landmarks = None
 
     def find_pose(self, img, draw=True):
@@ -29,9 +23,8 @@ class MediaPipeDetector(PoseDetectorBase):
         results = self.pose.process(rgb)
         self.landmarks = None
         if results.pose_landmarks:
-            self.landmarks = []
-            for i, lm in enumerate(results.pose_landmarks.landmark):
-                self.landmarks.append([i, lm.x, lm.y, lm.z, lm.visibility])
+            self.landmarks = [[i, lm.x, lm.y, lm.z, lm.visibility]
+                              for i, lm in enumerate(results.pose_landmarks.landmark)]
             if draw:
                 draw_landmarks(img, results.pose_landmarks, POSE_CONNECTIONS)
         return img
@@ -41,11 +34,8 @@ class MediaPipeDetector(PoseDetectorBase):
 
 class YOLOPoseDetector(PoseDetectorBase):
     def __init__(self, model_path="yolo11n-pose.pt", device="cpu"):
-        try:
-            from ultralytics import YOLO
-            self.model = YOLO(model_path)
-        except ImportError:
-            raise ImportError("Install ultralytics: pip install ultralytics")
+        from ultralytics import YOLO
+        self.model = YOLO(model_path)
         self.device = device
         self.landmarks = None
 
@@ -54,17 +44,9 @@ class YOLOPoseDetector(PoseDetectorBase):
         if results and results[0].keypoints is not None:
             kpts = results[0].keypoints.data[0].cpu().numpy()
             full = np.zeros((33, 3))
-            map_yolo_to_mp = {5:11,6:12,7:13,8:14,9:15,10:16,11:23,12:24,13:25,14:26,15:27,16:28}
-            for y_idx, mp_idx in map_yolo_to_mp.items():
-                if y_idx < len(kpts):
-                    full[mp_idx,0] = kpts[y_idx,0]
-                    full[mp_idx,1] = kpts[y_idx,1]
-                    full[mp_idx,2] = kpts[y_idx,2]
-            self.landmarks = [[i, full[i,0], full[i,1], full[i,2], 1.0] for i in range(33)]
-            if draw:
-                for (x,y) in full[:,:2]:
-                    if x>0 and y>0:
-                        cv2.circle(img, (int(x), int(y)), 3, (0,255,0), -1)
+            for y, m in {5:11,6:12,7:13,8:14,9:15,10:16,11:23,12:24,13:25,14:26,15:27,16:28}.items():
+                if y < len(kpts): full[m] = kpts[y]
+            self.landmarks = [[i,full[i,0],full[i,1],full[i,2],1.0] for i in range(33)]
         else:
             self.landmarks = None
         return img
@@ -73,9 +55,6 @@ class YOLOPoseDetector(PoseDetectorBase):
         return self.landmarks
 
 def get_pose_detector(detector_type="mediapipe", **kwargs):
-    if detector_type == "mediapipe":
-        return MediaPipeDetector(**kwargs)
-    elif detector_type == "yolo":
-        return YOLOPoseDetector(**kwargs)
-    else:
-        raise ValueError(f"Unknown detector: {detector_type}")
+    if detector_type == "mediapipe": return MediaPipeDetector(**kwargs)
+    elif detector_type == "yolo": return YOLOPoseDetector(**kwargs)
+    else: raise ValueError(f"Unknown detector: {detector_type}")
