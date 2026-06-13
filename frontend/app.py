@@ -260,7 +260,7 @@ if st.session_state["video_mode"] == "camera":
             break
         frame = process_frame(frame, 0)
         frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        frame_placeholder.image(frame_rgb, channels="RGB", use_container_width=True)
+        frame_placeholder.image(frame_rgb, channels="RGB", use_column_width=True)
         time.sleep(0.03)
 
     cap.release()
@@ -285,7 +285,7 @@ else:
                     break
                 frame = process_frame(frame, frame_num)
                 frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-                frame_placeholder.image(frame_rgb, channels="RGB", use_container_width=True)
+                frame_placeholder.image(frame_rgb, channels="RGB", use_column_width=True)
                 time.sleep(frame_delay)
                 frame_num += 1
             cap.release()
