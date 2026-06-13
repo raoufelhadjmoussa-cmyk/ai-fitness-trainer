@@ -1,4 +1,4 @@
-import streamlit as st
+﻿import streamlit as st
 import cv2
 import numpy as np
 import time
@@ -27,7 +27,7 @@ from backend.utils import calculate_angle
 # Streamlit page config
 # ------------------------------------------------------------------
 st.set_page_config(page_title="My Trainer", layout="wide")
-st.title("Ã°Å¸Ââ€¹Ã¯Â¸Â My Trainer")
+st.title("ƒ…‚‚ƒ‚‚ My Trainer")
 st.markdown("*Your personal AI fitness coach*")
 
 # ------------------------------------------------------------------
@@ -65,9 +65,9 @@ if "stop_camera" not in st.session_state:
     st.session_state["stop_camera"] = False
 
 # ------------------------------------------------------------------
-# Sidebar Ã¢â‚¬â€œ user profile and controls
+# Sidebar ƒ€š‚“ user profile and controls
 # ------------------------------------------------------------------
-st.sidebar.header("Ã°Å¸â€˜Â¤ User Profile")
+st.sidebar.header("ƒ…‚œ‚ User Profile")
 weight = st.sidebar.number_input("Weight (kg)", 30, 200, 70)
 age = st.sidebar.number_input("Age", 15, 100, 30)
 sex = st.sidebar.selectbox("Sex", ["Male", "Female"])
@@ -77,8 +77,8 @@ mode = st.sidebar.radio("Exercise Mode", ["Auto-detect", "Manual"])
 manual_exercise = st.sidebar.selectbox("Choose exercise", list(EXERCISE_THRESHOLDS.keys())) if mode == "Manual" else None
 
 # Input source selection
-input_source = st.sidebar.radio("Input Source", ["Ã°Å¸â€œÂ· Live Camera", "Ã°Å¸Å½Â¥ Upload Video"])
-if input_source == "Ã°Å¸â€œÂ· Live Camera":
+input_source = st.sidebar.radio("Input Source", ["ƒ…‚“‚ Live Camera", "ƒ……‚ Upload Video"])
+if input_source == "ƒ…‚“‚ Live Camera":
     st.session_state["video_mode"] = "camera"
 else:
     st.session_state["video_mode"] = "file"
@@ -87,7 +87,7 @@ else:
         tfile = tempfile.NamedTemporaryFile(delete=False, suffix=".mp4")
         tfile.write(uploaded_file.read())
         st.session_state["video_path"] = tfile.name
-        st.sidebar.success("Ã¢Å“â€¦ Video loaded")
+        st.sidebar.success("ƒ…€œ‚ Video loaded")
         if st.session_state["video_cap"] is not None:
             st.session_state["video_cap"].release()
         st.session_state["video_cap"] = cv2.VideoCapture(st.session_state["video_path"])
@@ -97,7 +97,7 @@ else:
 # Session controls
 col_btn1, col_btn2 = st.sidebar.columns(2)
 with col_btn1:
-    if st.button("Ã¢â€“Â¶Ã¯Â¸Â Start Session"):
+    if st.button("ƒ‚€œ‚ƒ‚‚ Start Session"):
         st.session_state["session"] = WorkoutSession(user_id="1", user_weight=weight)
         st.session_state["running"] = True
         st.session_state["fatigue"] = FatigueEstimator()
@@ -106,7 +106,7 @@ with col_btn1:
         st.session_state["last_exercise"] = None
         st.success("Session started!")
 with col_btn2:
-    if st.button("Ã¢ÂÂ¹Ã¯Â¸Â End Session"):
+    if st.button("ƒ‚‚ƒ‚‚ End Session"):
         if st.session_state.get("session") is not None:
             summary = st.session_state["session"].end_session()
             st.success(f"Session saved! Calories: {summary['total_calories']:.0f}")
@@ -114,7 +114,7 @@ with col_btn2:
 
 # Camera stop button (only when camera mode)
 if st.session_state["video_mode"] == "camera":
-    if st.sidebar.button("Ã°Å¸â€ºâ€˜ Stop Camera"):
+    if st.sidebar.button("ƒ…‚‚œ Stop Camera"):
         st.session_state["stop_camera"] = True
 
 # ------------------------------------------------------------------
@@ -221,23 +221,23 @@ def process_frame(frame, frame_num):
                 motion_score = 100
 
             if fatigue_score > 80:
-                st.session_state["voice"].speak("High fatigue Ã¢â‚¬â€œ consider resting")
+                st.session_state["voice"].speak("High fatigue ƒ€š‚“ consider resting")
 
             cv2.putText(frame, f"{exercise} | Reps: {count}", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
             cv2.putText(frame, f"Form: {form_score:.0f}  Motion: {motion_score:.0f}  Fatigue: {fatigue_score:.0f}", (10, 60), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
 
             if st.session_state.get("running") and st.session_state.get("session") is not None:
                 stats = st.session_state["session"].get_stats()
-                stats_placeholder.metric("Ã¢ÂÂ±Ã¯Â¸Â Duration", f"{stats['duration']:.0f}s")
-                stats_placeholder.metric("Ã°Å¸â€Â¥ Calories", f"{stats['calories']:.0f}")
-                stats_placeholder.metric("Ã°Å¸Ëœâ€œ Fatigue", f"{fatigue_score:.0f}")
-                stats_placeholder.write("**Ã°Å¸â€œÅ  Reps per exercise:**")
+                stats_placeholder.metric("ƒ‚‚ƒ‚‚ Duration", f"{stats['duration']:.0f}s")
+                stats_placeholder.metric("ƒ…‚‚ Calories", f"{stats['calories']:.0f}")
+                stats_placeholder.metric("ƒ…‹“‚“ Fatigue", f"{fatigue_score:.0f}")
+                stats_placeholder.write("**ƒ…‚“… Reps per exercise:**")
                 for ex, r in stats["reps"].items():
                     stats_placeholder.write(f"- {ex.capitalize()}: {r}")
             else:
                 stats_placeholder.info("Start a session to track your workout")
 
-            feedback_placeholder.write("\n".join(feedback_msgs[:2]) if feedback_msgs else "Ã¢Å“â€¦ Form looks good!")
+            feedback_placeholder.write("\n".join(feedback_msgs[:2]) if feedback_msgs else "ƒ…€œ‚ Form looks good!")
 
     return frame
 
@@ -250,7 +250,7 @@ if st.session_state["video_mode"] == "camera":
         st.error("Cannot open webcam")
         st.stop()
 
-    run = st.checkbox("Ã°Å¸Å½Â¥ Start Camera", value=True)
+    run = st.checkbox("ƒ……‚ Start Camera", value=True)
     if run:
         st.session_state["stop_camera"] = False
 
@@ -271,8 +271,8 @@ else:
     if st.session_state["video_cap"] is None or not st.session_state["video_cap"].isOpened():
         st.warning("Please upload a video file first.")
     else:
-        play_video = st.button("Ã¢â€“Â¶Ã¯Â¸Â Process Video")
-        stop_video = st.button("Ã¢ÂÂ¹Ã¯Â¸Â Stop")
+        play_video = st.button("ƒ‚€œ‚ƒ‚‚ Process Video")
+        stop_video = st.button("ƒ‚‚ƒ‚‚ Stop")
         if play_video:
             cap = st.session_state["video_cap"]
             fps = cap.get(cv2.CAP_PROP_FPS)
