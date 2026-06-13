@@ -2,9 +2,8 @@
 import numpy as np
 from abc import ABC, abstractmethod
 
-import mediapipe as mp
-from mediapipe.python.solutions import pose as mp_pose_solution
-from mediapipe.python.solutions import drawing_utils as mp_drawing
+from mediapipe.python.solutions.pose import Pose, POSE_CONNECTIONS
+from mediapipe.python.solutions.drawing_utils import draw_landmarks
 
 class PoseDetectorBase(ABC):
     @abstractmethod
@@ -17,13 +16,12 @@ class PoseDetectorBase(ABC):
 class MediaPipeDetector(PoseDetectorBase):
     def __init__(self, static_mode=False, model_complexity=1,
                  min_detection_confidence=0.5, min_tracking_confidence=0.5):
-        self.pose = mp_pose_solution.Pose(
+        self.pose = Pose(
             static_image_mode=static_mode,
             model_complexity=model_complexity,
             min_detection_confidence=min_detection_confidence,
             min_tracking_confidence=min_tracking_confidence
         )
-        self.POSE_CONNECTIONS = mp_pose_solution.POSE_CONNECTIONS
         self.landmarks = None
 
     def find_pose(self, img, draw=True):
@@ -35,11 +33,7 @@ class MediaPipeDetector(PoseDetectorBase):
             for i, lm in enumerate(results.pose_landmarks.landmark):
                 self.landmarks.append([i, lm.x, lm.y, lm.z, lm.visibility])
             if draw:
-                mp_drawing.draw_landmarks(
-                    img,
-                    results.pose_landmarks,
-                    self.POSE_CONNECTIONS
-                )
+                draw_landmarks(img, results.pose_landmarks, POSE_CONNECTIONS)
         return img
 
     def get_landmarks(self, img):
