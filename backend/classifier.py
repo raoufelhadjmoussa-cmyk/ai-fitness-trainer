@@ -30,7 +30,7 @@ class ExerciseClassifier:
         self.seq_len = seq_len
         self.model = ExerciseLSTM(num_classes=11)
         if Path(model_path).exists():
-            self.model.load_state_dict(torch.load(model_path, map_location=device))
+            self.model.load_state_dict(torch.load(model_path, map_location=device, weights_only=False))
         self.model.to(device)
         self.model.eval()
         self.buffer = []  # stores flattened landmarks for last seq_len frames
